@@ -1,0 +1,24 @@
+name: email-triage-env
+description: A real-world email triage and response environment for evaluating AI agents
+
+entry_point: env.environment:EmailEnv
+
+tasks:
+  - name: easy
+    description: Classify simple emails (spam vs urgent vs normal)
+
+  - name: medium
+    description: Handle ambiguous emails and choose correct actions
+
+  - name: hard
+    description: Full triage with classification + action + response generation
+
+observation_space:
+  type: object
+  description: Current email, inbox size, step count, thread history
+
+action_space:
+  type: object
+  description: classify, reply, archive, escalate with optional content
+
+reward_range: [-1.0, 1.0]

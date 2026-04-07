@@ -1,0 +1,8 @@
+fastapi>=0.110
+uvicorn[standard]
+pydantic>=2.0
+openenv-core
+openai
+numpy
+pillow
+requests

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "e1", "difficulty": "easy",
+    "subject": "Congratulations! You've won $1,000,000!!!",
+    "body": "Click here immediately to claim your prize. Limited time only. Provide your bank details.",
+    "sender": "winnings@lottery-fake.biz",
+    "priority": "spam",
+    "thread_id": null,
+    "expected_action": "archive"
+  },
+  {
+    "id": "e2", "difficulty": "easy",
+    "subject": "Team standup - 10am today",
+    "body": "Quick reminder that standup is at 10am in the Zoom link. Please update your tasks.",
+    "sender": "manager@company.com",
+    "priority": "normal",
+    "thread_id": "th_standup",
+    "expected_action": "reply"
+  },
+  {
+    "id": "e3", "difficulty": "easy",
+    "subject": "PRODUCTION DOWN - All hands",
+    "body": "Our main production API is down. 100% error rate. All engineers please respond immediately.",
+    "sender": "oncall@company.com",
+    "priority": "urgent",
+    "thread_id": "th_prod_outage",
+    "expected_action": "escalate"
+  },
+  {
+    "id": "m1", "difficulty": "medium",
+    "subject": "Invoice #4920 Payment Required",
+    "body": "Your account balance is overdue. Please settle via gift card purchases or wire transfer. Failure will result in legal action.",
+    "sender": "billing-urgent99@gmail.com",
+    "priority": "spam",
+    "thread_id": null,
+    "expected_action": "archive"
+  },
+  {
+    "id": "m2", "difficulty": "medium",
+    "subject": "Re: Q2 Roadmap Review",
+    "body": "Following up on yesterday's discussion. I need the updated roadmap slide deck by EOD or the board meeting prep will slip.",
+    "sender": "cto@company.com",
+    "priority": "urgent",
+    "thread_id": "th_q2_roadmap",
+    "expected_action": "reply"
+  },
+  {
+    "id": "m3", "difficulty": "medium",
+    "subject": "Lunch plans next week?",
+    "body": "Hey! Are we still on for the team lunch on Tuesday? Let me know if you need me to book the restaurant.",
+    "sender": "colleague@company.com",
+    "priority": "normal",
+    "thread_id": "th_lunch",
+    "expected_action": "reply"
+  },
+  {
+    "id": "m4", "difficulty": "medium",
+    "subject": "Unusual login attempt detected",
+    "body": "We detected a login from an unrecognized IP. If this was not you, click here to secure your account.",
+    "sender": "security-noreply@accounts-google-verify.com",
+    "priority": "spam",
+    "thread_id": null,
+    "expected_action": "archive"
+  },
+  {
+    "id": "h1", "difficulty": "hard",
+    "subject": "Re: Re: Merger Documentation - CONFIDENTIAL",
+    "body": "As discussed in our last three calls, I am attaching the final version of the acquisition agreement. Please review Clause 7b especially. Legal needs your sign-off by market open tomorrow.",
+    "sender": "legal-partner@acquisitions-firm.com",
+    "priority": "urgent",
+    "thread_id": "th_merger_legal",
+    "expected_action": "escalate"
+  },
+  {
+    "id": "h2", "difficulty": "hard",
+    "subject": "Can't login - presenting in 10 min!!",
+    "body": "I am completely locked out of my Salesforce account and I have a demo for a Fortune 500 client in 10 minutes. This is a $2M deal. PLEASE HELP.",
+    "sender": "sales-vp@company.com",
+    "priority": "urgent",
+    "thread_id": "th_salesforce_lockout",
+    "expected_action": "escalate"
+  },
+  {
+    "id": "h3", "difficulty": "hard",
+    "subject": "Your monthly wellness newsletter",
+    "body": "Hello team! Here are your top 10 desk ergonomics tips for April. Stay healthy and productive!",
+    "sender": "wellbeing-bot@hr.company.com",
+    "priority": "normal",
+    "thread_id": "th_hr_newsletter",
+    "expected_action": "archive"
+  }
+]
