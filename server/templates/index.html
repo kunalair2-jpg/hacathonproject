@@ -852,28 +852,52 @@
     </div>
 
     <script>
-        let currentEmail = null;
-        let totalReward = 0;
-        let steps = 0;
-        let isAgentRunning = false;
-
-        let stats = {
-            inbox: 0,
-            archive: 0,
-            escalated: 0,
-            replied: 0
+        // State Management (React-like architecture)
+        let state = {
+            currentTab: 'inbox',
+            pendingEmail: null,
+            history: [],
+            isAgentRunning: false,
+            totalReward: 0,
+            steps: 0,
+            stats: { inbox: 0, archive: 0, escalated: 0, replied: 0 }
         };
 
         const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-        function updateStatsUI() {
-            document.getElementById('badge-inbox').innerText = stats.inbox;
-            document.getElementById('badge-archive').innerText = stats.archive;
-            document.getElementById('badge-escalated').innerText = stats.escalated;
-            document.getElementById('badge-replied').innerText = stats.replied;
-            document.getElementById('stat-reward').innerText = totalReward.toFixed(4);
-            document.getElementById('stat-steps').innerText = steps;
+        function generateUUID() {
+            return 'req_' + Math.random().toString(36).substring(2, 10);
         }
+
+        function updateUI() {
+            // Update Sidebar stats
+            document.getElementById('badge-inbox').innerText = state.stats.inbox;
+            document.getElementById('badge-archive').innerText = state.stats.archive;
+            document.getElementById('badge-escalated').innerText = state.stats.escalated;
+            document.getElementById('badge-replied').innerText = state.stats.replied;
+
+            // Update Header stats
+            document.getElementById('stat-reward').innerText = state.totalReward.toFixed(4);
+            document.getElementById('stat-steps').innerText = state.steps;
+
+            // Update Tabs
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav-' + state.currentTab).classList.add('active');
+
+            // Render List
+            renderEmailList();
+        }
+
+        function switchTab(tabId) {
+            state.currentTab = tabId;
+            updateUI();
+        }
+
+        // Attach listeners to tabs
+        document.getElementById('nav-inbox').onclick = () => switchTab('inbox');
+        document.getElementById('nav-archive').onclick = () => switchTab('archive');
+        document.getElementById('nav-escalated').onclick = () => switchTab('escalated');
+        document.getElementById('nav-replied').onclick = () => switchTab('replied');
 
         async function resetEnv() {
             const task = document.getElementById('task-select').value;
@@ -884,64 +908,140 @@
             });
             const data = await res.json();
 
-            totalReward = 0;
-            steps = 0;
-            stats.archive = 0;
-            stats.escalated = 0;
-            stats.replied = 0;
-            stats.inbox = data.observation.inbox_remaining;
+            state.totalReward = 0;
+            state.steps = 0;
+            state.history = [];
+            state.stats = { archive: 0, escalated: 0, replied: 0, inbox: data.observation.inbox_remaining };
+            state.pendingEmail = data.observation.email;
 
-            updateStatsUI();
+            if (state.pendingEmail) {
+                state.pendingEmail.sys_id = generateUUID();
+                state.pendingEmail.sys_time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
 
-            currentEmail = data.observation.email;
-            document.getElementById('empty-state').style.display = 'none';
-            document.getElementById('reading-pane').style.display = 'block';
-
-            renderEmailList(currentEmail);
-            renderReadingPane(currentEmail);
+            switchTab('inbox');
         }
 
-        function renderEmailList(email) {
-            const list = document.getElementById('email-list');
-            list.innerHTML = `
-                <div class="email-item active" id="email-item">
+        function renderEmailList() {
+            const listNode = document.getElementById('email-list');
+            const emptyNode = document.getElementById('empty-state');
+            const readingNode = document.getElementById('reading-pane');
+
+            let items = [];
+            if (state.currentTab === 'inbox') {
+                if (state.pendingEmail) items = [state.pendingEmail];
+            } else {
+                let actionFilter = 'archive';
+                if (state.currentTab === 'escalated') actionFilter = 'escalate';
+                if (state.currentTab === 'replied') actionFilter = 'reply';
+
+                items = state.history.filter(e => e.final_action === actionFilter);
+            }
+
+            if (items.length === 0) {
+                listNode.innerHTML = "";
+                readingNode.style.display = 'none';
+                emptyNode.style.display = 'flex';
+                // Adjust empty text based on tab
+                if (state.currentTab === 'inbox') {
+                    emptyNode.innerHTML = `
+                      <div style="background: var(--bg); border-radius: 50%; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="M22 17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.5C2 7 4 5 6.5 5H18c2.2 0 4 1.8 4 4v8Z"/><polyline points="15,9 18,9 22,15"/><path d="M20 13H4"/><path d="M15 13v-4"/></svg>
+                      </div>
+                      <div style="font-size: 20px; font-weight: 600; color: var(--text-title);">Queue Empty</div>
+                      <p style="margin-top: 8px; font-size: 15px; max-width: 300px; text-align: center; color: var(--text-muted);">No pending messages.</p>`;
+                } else {
+                    emptyNode.innerHTML = `
+                      <div style="font-size: 20px; font-weight: 600; color: var(--text-title); margin-top: 50px;">No messages here</div>`;
+                }
+                return;
+            }
+
+            emptyNode.style.display = 'none';
+            readingNode.style.display = 'block';
+
+            listNode.innerHTML = items.map((em, idx) => `
+                <div class="email-item ${idx === 0 ? 'active' : ''}" onclick="viewEmail('${em.sys_id}')" id="em-node-${em.sys_id}">
                     <div class="email-sender">
-                        <span>${email.sender}</span>
-                        <span class="time">Just now</span>
+                        <span>${em.sender}</span>
+                        <span class="time">${em.sys_time || 'Just now'}</span>
                     </div>
-                    <div class="email-subject">${email.subject}</div>
-                    <div class="email-preview">${email.body}</div>
+                    <div class="email-subject">${em.subject}</div>
+                    <div class="email-preview">${em.body}</div>
                 </div>
-            `;
+            `).join('');
+
+            // Automatically view the first item in the list
+            viewEmail(items[0].sys_id);
         }
 
-        function renderReadingPane(email) {
+        window.viewEmail = function (sysId) {
+            // Update active state in list
+            document.querySelectorAll('.email-item').forEach(el => el.classList.remove('active'));
+            const node = document.getElementById('em-node-' + sysId);
+            if (node) node.classList.add('active');
+
+            let email = null;
+            if (state.pendingEmail && state.pendingEmail.sys_id === sysId) {
+                email = state.pendingEmail;
+            } else {
+                email = state.history.find(e => e.sys_id === sysId);
+            }
+            if (!email) return;
+
             document.getElementById('read-subject').innerText = email.subject;
             document.getElementById('read-sender').innerText = email.sender;
             document.getElementById('read-id').innerText = email.category.toUpperCase() + " • ROUTING: " + email.routing.toUpperCase();
             document.getElementById('read-body').innerText = email.body;
             document.getElementById('read-avatar').innerText = email.sender.charAt(0).toUpperCase();
-            document.getElementById('agent-overlay').classList.remove('visible');
+
+            const overlay = document.getElementById('agent-overlay');
+            if (state.currentTab !== 'inbox' && email.final_action) {
+                // Show history decision
+                const chip = document.getElementById('overlay-action');
+                const rep = document.getElementById('overlay-reply');
+                chip.innerText = email.final_action.toUpperCase();
+                chip.className = "action-chip " + email.final_action;
+                document.getElementById('overlay-desc').innerText = "Historical Automated Decision";
+
+                if (email.final_content) {
+                    rep.style.display = 'block';
+                    rep.innerText = "Draft Sent: " + email.final_content;
+                } else {
+                    rep.style.display = 'none';
+                }
+                document.getElementById('overlay-reward').innerHTML = `<span>Final Record</span>`;
+                document.getElementById('overlay-reward').className = "reward-badge";
+                overlay.classList.add('visible');
+            } else {
+                overlay.classList.remove('visible');
+            }
         }
 
         async function startAgent() {
-            if (!currentEmail) return;
+            if (!state.pendingEmail && state.currentTab === 'inbox') return;
 
-            if (isAgentRunning) {
-                isAgentRunning = false;
+            if (state.isAgentRunning) {
+                state.isAgentRunning = false;
                 document.getElementById('btn-start').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Resume Automation';
                 return;
             }
 
-            isAgentRunning = true;
+            // Force switch to inbox if started
+            if (state.currentTab !== 'inbox') {
+                switchTab('inbox');
+            }
+
+            state.isAgentRunning = true;
             document.getElementById('btn-start').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" class="live-dot" style="animation: none; fill: none; stroke-width: 2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> Stop Automation';
 
-            while (currentEmail && isAgentRunning) {
+            while (state.pendingEmail && state.isAgentRunning) {
                 await sleep(800);
-                if (!isAgentRunning) break;
+                if (!state.isAgentRunning) break;
 
-                let actionType = currentEmail.expected_action;
-                let payload = { action_type: actionType, category_tag: currentEmail.category, routing: currentEmail.routing };
+                let emailActive = state.pendingEmail;
+                let actionType = emailActive.expected_action;
+                let payload = { action_type: actionType, category_tag: emailActive.category, routing: emailActive.routing };
 
                 let text = "Reading email semantics...";
                 let contentStr = "";
@@ -958,12 +1058,11 @@
 
                 showOverlay(actionType, text, contentStr);
 
-                // break sleep into chunks so it can immediately cancel if stopped
                 for (let i = 0; i < 18; i++) {
                     await sleep(100);
-                    if (!isAgentRunning) break;
+                    if (!state.isAgentRunning) break;
                 }
-                if (!isAgentRunning) {
+                if (!state.isAgentRunning) {
                     document.getElementById('agent-overlay').classList.remove('visible');
                     break;
                 }
@@ -976,21 +1075,30 @@
                 const data = await res.json();
 
                 let r = data.reward;
-                totalReward += r;
-                steps++;
+                state.totalReward += r;
+                state.steps++;
 
                 let rwNode = document.getElementById('overlay-reward');
                 rwNode.innerHTML = (r > 0 ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>') +
                     "<span>" + (r >= 0 ? "+" : "") + r.toFixed(2) + " Accuracy</span>";
                 rwNode.className = "reward-badge " + (r < 0 ? "negative" : "");
 
-                updateCounters(actionType);
-                updateStatsUI();
+                // Update historic state
+                state.stats.inbox--;
+                if (actionType === 'archive') state.stats.archive++;
+                if (actionType === 'escalate') state.stats.escalated++;
+                if (actionType === 'reply') state.stats.replied++;
+
+                emailActive.final_action = actionType;
+                emailActive.final_content = contentStr;
+                state.history.push(emailActive);
+
+                updateUI();
 
                 await sleep(1000);
-                if (!isAgentRunning) break;
+                if (!state.isAgentRunning) break;
 
-                const item = document.getElementById('email-item');
+                const item = document.getElementById('em-node-' + emailActive.sys_id);
                 if (item) {
                     item.className = "email-item anim-" + actionType;
                 }
@@ -999,19 +1107,17 @@
                 await sleep(400);
 
                 if (data.done) {
-                    currentEmail = null;
-                    document.getElementById('reading-pane').style.display = 'none';
-                    document.getElementById('empty-state').style.display = 'flex';
-                    document.getElementById('email-list').innerHTML = "";
-                    isAgentRunning = false;
+                    state.pendingEmail = null;
+                    state.isAgentRunning = false;
                     document.getElementById('btn-start').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Start Automation';
+                    updateUI();
                     break;
                 } else {
-                    currentEmail = data.observation.email;
-                    stats.inbox = data.observation.inbox_remaining;
-                    updateStatsUI();
-                    renderEmailList(currentEmail);
-                    renderReadingPane(currentEmail);
+                    state.pendingEmail = data.observation.email;
+                    state.pendingEmail.sys_id = generateUUID();
+                    state.pendingEmail.sys_time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    state.stats.inbox = data.observation.inbox_remaining;
+                    updateUI();
                 }
             }
         }
@@ -1037,13 +1143,6 @@
             rwNode.className = "reward-badge";
 
             overlay.classList.add('visible');
-        }
-
-        function updateCounters(actionType) {
-            stats.inbox--;
-            if (actionType === 'archive') stats.archive++;
-            if (actionType === 'escalate') stats.escalated++;
-            if (actionType === 'reply') stats.replied++;
         }
 
         resetEnv();
