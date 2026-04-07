@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +39,7 @@
             width: 280px;
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
-            border-right: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             padding: 24px;
             display: flex;
             flex-direction: column;
@@ -78,7 +79,7 @@
         }
 
         .badge {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 12px;
@@ -93,7 +94,7 @@
 
         .header {
             height: 70px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -144,7 +145,7 @@
 
         .email-list {
             width: 400px;
-            border-right: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -152,7 +153,7 @@
 
         .email-item {
             padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             cursor: pointer;
             transition: 0.2s;
             position: relative;
@@ -211,7 +212,7 @@
             gap: 16px;
             margin-bottom: 32px;
             padding-bottom: 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .avatar {
@@ -240,7 +241,7 @@
             right: 40px;
             background: rgba(30, 41, 59, 0.9);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 24px;
             border-radius: 12px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
@@ -266,17 +267,28 @@
         }
 
         .action-chip {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             padding: 4px 12px;
             border-radius: 16px;
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
         }
-        
-        .action-chip.archive { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .action-chip.reply { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-        .action-chip.escalate { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        .action-chip.archive {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+
+        .action-chip.reply {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .action-chip.escalate {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
 
         .ai-typing {
             font-family: monospace;
@@ -320,10 +332,19 @@
 
         /* Animations */
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
+
         .live-dot {
             width: 8px;
             height: 8px;
@@ -335,20 +356,147 @@
 
         /* Fly out animation */
         @keyframes flyOutArchive {
-            to { transform: translateX(-100%); opacity: 0; }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
         }
-        @keyframes flyOutEscalate {
-            to { transform: translateY(-100%) scale(0.8); opacity: 0; }
-        }
-        @keyframes flyOutReply {
-            to { transform: translateX(100%); opacity: 0; }
-        }
-        .anim-archive { animation: flyOutArchive 0.5s forwards; }
-        .anim-escalate { animation: flyOutEscalate 0.5s forwards; }
-        .anim-reply { animation: flyOutReply 0.5s forwards; }
 
+        @keyframes flyOutEscalate {
+            to {
+                transform: translateY(-100%) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        @keyframes flyOutReply {
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .anim-archive {
+            animation: flyOutArchive 0.5s forwards;
+        }
+
+        .anim-escalate {
+            animation: flyOutEscalate 0.5s forwards;
+        }
+
+        .anim-reply {
+            animation: flyOutReply 0.5s forwards;
+        }
+
+        /* ======== RESPONSIVE DESIGN ======== */
+        @media (max-width: 1024px) {
+            .content-area {
+                flex-direction: column;
+            }
+
+            .email-list {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .reading-pane {
+                padding: 24px;
+            }
+
+            .agent-action-overlay {
+                right: 24px;
+                bottom: 24px;
+                max-width: 320px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 12px;
+                padding: 16px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .logo {
+                margin-bottom: 0;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 120px;
+                margin-bottom: 0;
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            .sidebar>div:last-child {
+                display: none;
+                /* Hide environment status text on mobile to save space */
+            }
+
+            .header {
+                height: auto;
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .agent-controls {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .agent-controls select {
+                flex: 1;
+            }
+
+            .content-area {
+                overflow: visible;
+            }
+
+            .reading-pane {
+                padding: 16px;
+            }
+
+            .email-full-subject {
+                font-size: 18px;
+            }
+
+            .email-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .agent-action-overlay {
+                position: static;
+                margin-top: 24px;
+                max-width: 100%;
+                transform: none;
+            }
+
+            .agent-action-overlay.visible {
+                transform: none;
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <!-- Sidebar -->
@@ -356,7 +504,7 @@
         <div class="logo">
             📬 Email Triage AI
         </div>
-        
+
         <div class="nav-item active" id="nav-inbox">
             <span>📥 Inbox</span>
             <span class="badge" id="badge-inbox">10</span>
@@ -375,7 +523,9 @@
         </div>
 
         <div style="margin-top: auto;">
-            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Environment Status</div>
+            <div
+                style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                Environment Status</div>
             <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
                 <span class="live-dot"></span>
                 <span>OpenEnv Loaded</span>
@@ -395,7 +545,8 @@
                 <div>Steps: <span class="stat-value" id="stat-steps">0</span></div>
             </div>
             <div class="agent-controls">
-                <select id="task-select" style="background: var(--surface); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 8px; border-radius: 6px;">
+                <select id="task-select"
+                    style="background: var(--surface); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 8px; border-radius: 6px;">
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
                     <option value="hard" selected>Hard</option>
@@ -435,8 +586,9 @@
                     <div class="reward-badge" id="overlay-reward">+0.85 Reward</div>
                 </div>
             </div>
-            
-            <div id="empty-state" style="flex:1; display:flex; align-items:center; justify-content:center; color: var(--text-muted); flex-direction: column;">
+
+            <div id="empty-state"
+                style="flex:1; display:flex; align-items:center; justify-content:center; color: var(--text-muted); flex-direction: column;">
                 <div style="font-size: 48px; margin-bottom: 16px;">📬</div>
                 <h3>Inbox is clear!</h3>
                 <p style="margin-top: 8px;">Click Reset to load new emails.</p>
@@ -449,7 +601,7 @@
         let totalReward = 0;
         let steps = 0;
         let isAgentRunning = false;
-        
+
         let stats = {
             inbox: 0,
             archive: 0,
@@ -472,24 +624,24 @@
             const task = document.getElementById('task-select').value;
             const res = await fetch('/reset', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({task_name: task})
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ task_name: task })
             });
             const data = await res.json();
-            
+
             totalReward = 0;
             steps = 0;
             stats.archive = 0;
             stats.escalated = 0;
             stats.replied = 0;
             stats.inbox = data.observation.inbox_remaining;
-            
+
             updateStatsUI();
-            
+
             currentEmail = data.observation.email;
             document.getElementById('empty-state').style.display = 'none';
             document.getElementById('reading-pane').style.display = 'block';
-            
+
             renderEmailList(currentEmail);
             renderReadingPane(currentEmail);
         }
@@ -516,27 +668,27 @@
 
         // Mock LLM inference for visual demo (makes decisions based on expected_action)
         async function startAgent() {
-            if(isAgentRunning || !currentEmail) return;
+            if (isAgentRunning || !currentEmail) return;
             isAgentRunning = true;
             document.getElementById('btn-start').disabled = true;
             document.getElementById('btn-start').innerText = "🤖 Agent Running...";
 
-            while(currentEmail) {
+            while (currentEmail) {
                 // 1. "Thinking" phase
                 await sleep(1000);
-                
+
                 // Determine action (cheating by using expected_action for pure UI demo purposes)
                 let actionType = currentEmail.expected_action;
                 let payload = { action_type: actionType, category_tag: currentEmail.category, routing: currentEmail.routing };
-                
+
                 let text = "Classifying...";
                 let contentStr = "";
-                
-                if(actionType === 'reply') {
+
+                if (actionType === 'reply') {
                     payload.content = "Thank you for reaching out. We have received your query and our team will get back to you shortly.";
                     contentStr = payload.content;
                     text = "Generating response draft...";
-                } else if(actionType === 'escalate') {
+                } else if (actionType === 'escalate') {
                     text = "Critical priority detected. Escalating to incident response.";
                 } else {
                     text = "Spam detected. Moving to archive.";
@@ -544,41 +696,41 @@
 
                 // Show overlay
                 showOverlay(actionType, text, contentStr);
-                
+
                 // Wait for visual effect
                 await sleep(2000);
 
                 // 2. Step the actual backend Env
                 const res = await fetch('/step', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({action: payload})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: payload })
                 });
                 const data = await res.json();
-                
+
                 // Update reward
                 let r = data.reward;
                 totalReward += r;
                 steps++;
-                
+
                 document.getElementById('overlay-reward').innerText = (r > 0 ? "+" : "") + r.toFixed(2) + " Reward";
                 document.getElementById('overlay-reward').className = "reward-badge " + (r < 0 ? "negative" : "");
-                
+
                 updateCounters(actionType);
                 updateStatsUI();
 
                 // 3. Animate out
                 await sleep(1500);
                 const item = document.getElementById('email-item');
-                if(item) {
+                if (item) {
                     item.className = "email-item anim-" + actionType;
                 }
                 document.getElementById('agent-overlay').classList.remove('visible');
-                
+
                 await sleep(500);
 
                 // 4. Load next observation
-                if(data.done) {
+                if (data.done) {
                     currentEmail = null;
                     document.getElementById('reading-pane').style.display = 'none';
                     document.getElementById('empty-state').style.display = 'flex';
@@ -603,29 +755,29 @@
             const overlay = document.getElementById('agent-overlay');
             const chip = document.getElementById('overlay-action');
             const rep = document.getElementById('overlay-reply');
-            
+
             chip.innerText = actionType.toUpperCase();
             chip.className = "action-chip " + actionType;
             document.getElementById('overlay-desc').innerText = desc;
-            
-            if(content) {
+
+            if (content) {
                 rep.style.display = 'block';
                 rep.innerText = content;
             } else {
                 rep.style.display = 'none';
             }
-            
+
             document.getElementById('overlay-reward').innerText = "Calculating...";
             document.getElementById('overlay-reward').className = "reward-badge";
-            
+
             overlay.classList.add('visible');
         }
 
         function updateCounters(actionType) {
             stats.inbox--;
-            if(actionType === 'archive') stats.archive++;
-            if(actionType === 'escalate') stats.escalated++;
-            if(actionType === 'reply') stats.replied++;
+            if (actionType === 'archive') stats.archive++;
+            if (actionType === 'escalate') stats.escalated++;
+            if (actionType === 'reply') stats.replied++;
         }
 
         // Initialize display
@@ -633,4 +785,5 @@
 
     </script>
 </body>
+
 </html>
