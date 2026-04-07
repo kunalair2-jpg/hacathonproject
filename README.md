@@ -10,6 +10,10 @@ pinned: false
 
 # 📧 OpenEnv AI Email Triage & Response System
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kunalair2-jpg/hacathonproject/blob/main/examples/grpo_training.ipynb)
+
+![Reward Curve](https://img.shields.io/badge/Reward_Curve-Optimizing...-success)
+
 ## Motivation
 Email triage is a universally understood, ubiquitous real-world problem. A highly competent AI must demonstrate **multi-step reasoning** (understanding the context and priority), **workflow actions** (archiving or escalating), and **generative capabilities** (drafting replies). This environment acts as a robust benchmark for these realistic multi-modal agentic paths, specifically targeting real-world utility over simple toy tasks.
 
