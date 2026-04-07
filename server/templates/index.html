@@ -925,13 +925,20 @@
         }
 
         async function startAgent() {
-            if (isAgentRunning || !currentEmail) return;
-            isAgentRunning = true;
-            document.getElementById('btn-start').disabled = true;
-            document.getElementById('btn-start').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" class="live-dot" style="animation: none; fill: none; stroke-width: 2"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg> Automating...';
+            if (!currentEmail) return;
 
-            while (currentEmail) {
+            if (isAgentRunning) {
+                isAgentRunning = false;
+                document.getElementById('btn-start').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Resume Automation';
+                return;
+            }
+
+            isAgentRunning = true;
+            document.getElementById('btn-start').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" class="live-dot" style="animation: none; fill: none; stroke-width: 2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> Stop Automation';
+
+            while (currentEmail && isAgentRunning) {
                 await sleep(800);
+                if (!isAgentRunning) break;
 
                 let actionType = currentEmail.expected_action;
                 let payload = { action_type: actionType, category_tag: currentEmail.category, routing: currentEmail.routing };
@@ -950,7 +957,16 @@
                 }
 
                 showOverlay(actionType, text, contentStr);
-                await sleep(1800);
+
+                // break sleep into chunks so it can immediately cancel if stopped
+                for (let i = 0; i < 18; i++) {
+                    await sleep(100);
+                    if (!isAgentRunning) break;
+                }
+                if (!isAgentRunning) {
+                    document.getElementById('agent-overlay').classList.remove('visible');
+                    break;
+                }
 
                 const res = await fetch('/step', {
                     method: 'POST',
@@ -971,7 +987,9 @@
                 updateCounters(actionType);
                 updateStatsUI();
 
-                await sleep(1500);
+                await sleep(1000);
+                if (!isAgentRunning) break;
+
                 const item = document.getElementById('email-item');
                 if (item) {
                     item.className = "email-item anim-" + actionType;
@@ -985,6 +1003,8 @@
                     document.getElementById('reading-pane').style.display = 'none';
                     document.getElementById('empty-state').style.display = 'flex';
                     document.getElementById('email-list').innerHTML = "";
+                    isAgentRunning = false;
+                    document.getElementById('btn-start').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Start Automation';
                     break;
                 } else {
                     currentEmail = data.observation.email;
@@ -994,11 +1014,6 @@
                     renderReadingPane(currentEmail);
                 }
             }
-
-            isAgentRunning = false;
-            document.getElementById('btn-start').disabled = false;
-            document.getElementById('btn-start').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Start Automation';
-            document.getElementById('badge-inbox').innerText = 0;
         }
 
         function showOverlay(actionType, desc, content) {
