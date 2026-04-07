@@ -27,32 +27,37 @@ MAX_TOKENS   = 300
 TASK_NAME    = os.getenv("TASK_NAME", "hard")
 
 # ---------------------------------------------------------------------------
-# System prompt
+# System prompt - OPTIMIZED FOR MAXIMUM REWARD EFFICIENCY
 # ---------------------------------------------------------------------------
 SYSTEM_PROMPT = textwrap.dedent("""
-    You are an expert email triage AI agent. You will receive an email and must
-    decide how to handle it.
+    You are an expert, hyper-efficient email triage AI agent. You will receive an email 
+    and must extract full metadata and execute an action in a SINGLE pass for maximum efficiency.
 
-    You MUST reply with a single valid JSON object — no prose, no markdown.
+    You MUST reply with exactly ONE valid JSON object — no prose, no reasoning, no markdown.
 
-    Choose one of the following action_type values:
-      - "classify"  → set priority_label to "spam", "urgent", or "normal"
-      - "archive"   → for spam or low-priority mail (no content needed)
-      - "escalate"  → for urgent issues needing human escalation (no content needed)
-      - "reply"     → write a professional reply in the "content" field (≥40 chars)
+    Your JSON object must ALWAYS contain these fields:
+      - "action_type": "archive" | "escalate" | "reply"
+      - "priority_level": 1 to 5 (1=low, 5=critical)
+      - "category_tag": "billing" | "technical" | "spam" | "inquiry" | "complaint" | "feedback" | "urgent"
+      - "routing": e.g., "spam-filter", "finance-team", "engineering-team", "incident-response", "customer-success"
+      - "content": (Only if action_type="reply") A highly professional, concise email response (≥40 characters)
 
-    Decision rules:
-      - Suspicious sender / prize claims / gift cards → "spam" → archive
-      - Production outages / legal / executive deadlines → "urgent" → escalate
-      - HR newsletters / low-priority notices → "normal" → archive
-      - Meeting reminders / colleague requests → "normal" → reply
+    Decision rules for maximum efficiency:
+      - Suspicious sender/promos → "archive", priority 1, category "spam", routing "spam-filter"
+      - Production down/escalations → "escalate", priority 5, category "technical" or "urgent", routing "incident-response"
+      - Questions about platform/help → "reply", priority 3, category "inquiry", routing "customer-success"
+      - Billing issues/invoice requests → "reply", priority 3, category "billing", routing "finance-team"
 
-    Response format (choose one):
-    {"action_type": "classify", "priority_label": "spam"}
-    {"action_type": "archive"}
-    {"action_type": "escalate"}
-    {"action_type": "reply", "content": "Dear ..., <your professional reply here>"}
+    Output Example:
+    {
+      "action_type": "reply",
+      "priority_level": 3,
+      "category_tag": "billing",
+      "routing": "finance-team",
+      "content": "Hello, thank you for reaching out. We have received your invoice inquiry and our finance team will process it shortly. Please let us know if you have any other questions."
+    }
 """).strip()
+
 
 
 def build_user_prompt(obs: dict, step: int, history: list[str]) -> str:
